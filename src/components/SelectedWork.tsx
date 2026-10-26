@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Reveal, RevealText } from "./ui/Reveal";
 
 interface ProjectDetail {
@@ -24,7 +25,7 @@ interface ProjectDetail {
   solution: string;
 }
 
-const PROJECTS: ProjectDetail[] = [
+const FEATURED_PROJECTS: ProjectDetail[] = [
   {
     id: "halo",
     name: "Halo",
@@ -63,53 +64,10 @@ const PROJECTS: ProjectDetail[] = [
     challenge: "Traditional 2D architectural PDFs and flat photography fail to communicate the spatial volume, daylighting, and proportion of luxury development projects.",
     solution: "Transformed flat CAD blueprints into a lightweight, navigable 3D pavilion model with layered elevation slices and real-time natural light transitions.",
   },
-  {
-    id: "strata",
-    name: "Strata",
-    category: "data",
-    industry: "Geospatial & Climate Data",
-    type: "Website Club Original",
-    label: "Studio Original",
-    tagline: "Topographical terrain rendered in depth contours.",
-    body: "An exploratory climate GIS visualizer where planetary elevation data is sliced into luminous neon topographic contours. Users can scrub depth levels, hover over elevation peaks, and inspect environmental metrics mapped directly onto spatial geometry.",
-    image: "/portfolio_strata_3d.jpg",
-    specs: ["GLSL Topo Shaders", "Point Cloud Elevation", "Interactive Depth Slicing", "Zero Main-Thread Lag"],
-    metrics: {
-      dwellTime: "+360%",
-      fps: "60 FPS Locked",
-      payload: "1.2 MB",
-    },
-    challenge: "Complex geospatial datasets overwhelm users when presented as dense numbers and 2D heatmaps.",
-    solution: "Created an interactive 3D holographic command-table interface where topography is rendered through WebGL shader contour slices that reveal data intuitively by altitude.",
-  },
-  {
-    id: "assembly",
-    name: "Assembly",
-    category: "hardware",
-    industry: "Luxury Furniture / Retail",
-    type: "Custom Build",
-    label: "Configurator Concept",
-    tagline: "Part-by-part self-assembling modern lounge chair.",
-    body: "An ultra-tactile luxury furniture configurator where a mid-century bentwood armchair self-assembles part-by-part in mid-air. Prospective buyers can rotate every brass fastener, swap textured wool upholstery, and inspect real-world ergonomics at 60 FPS.",
-    image: "/portfolio_assembly_3d.jpg",
-    specs: ["Exploded Parts Engine", "Photoreal Fabric PBR", "Bentwood Grain Shaders", "Mobile Touch Controls"],
-    metrics: {
-      dwellTime: "+320%",
-      fps: "60 FPS Locked",
-      payload: "1.3 MB",
-    },
-    challenge: "Flat e-commerce product photos deliver low buyer confidence for high-ticket designer furniture, leading to high cart abandonment.",
-    solution: "A zero-latency 3D assembly configurator that showcases craftsmanship joinery, genuine material textures, and hardware fittings under studio lighting.",
-  },
 ];
 
 export function SelectedWork() {
-  const [activeFilter, setActiveFilter] = useState<"all" | "hardware" | "spatial" | "data">("all");
   const [activeModalProject, setActiveModalProject] = useState<ProjectDetail | null>(null);
-
-  const filteredProjects = activeFilter === "all"
-    ? PROJECTS
-    : PROJECTS.filter((p) => p.category === activeFilter);
 
   return (
     <section id="work" className="section sw-section" aria-labelledby="work-title">
@@ -119,9 +77,9 @@ export function SelectedWork() {
           <div className="sw-header-left">
             <span className="sw-eyebrow">
               <span className="sw-eyebrow-dot" />
-              STUDIO PORTFOLIO & PROOF
+              STUDIO PORTFOLIO &amp; PROOF
             </span>
-            <RevealText id="work-title" text="Selected 3D Experiences" className="h2 sw-h2" />
+            <RevealText id="work-title" text="Featured 3D Experiences" className="h2 sw-h2" />
           </div>
 
           <div className="sw-header-right">
@@ -132,51 +90,21 @@ export function SelectedWork() {
               </p>
             </Reveal>
 
-            {/* Filter Pills */}
-            <div className="sw-filter-tabs" role="tablist" aria-label="Portfolio category filter">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === "all"}
-                onClick={() => setActiveFilter("all")}
-                className={`sw-filter-btn ${activeFilter === "all" ? "is-active" : ""}`}
-              >
-                All Works ({PROJECTS.length})
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === "hardware"}
-                onClick={() => setActiveFilter("hardware")}
-                className={`sw-filter-btn ${activeFilter === "hardware" ? "is-active" : ""}`}
-              >
-                Hardware & Retail
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === "spatial"}
-                onClick={() => setActiveFilter("spatial")}
-                className={`sw-filter-btn ${activeFilter === "spatial" ? "is-active" : ""}`}
-              >
-                Spatial & Architecture
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === "data"}
-                onClick={() => setActiveFilter("data")}
-                className={`sw-filter-btn ${activeFilter === "data" ? "is-active" : ""}`}
-              >
-                Data & Shaders
-              </button>
+            {/* Link to Dedicated Work Archive */}
+            <div className="sw-top-view-all">
+              <Link href="/work" className="sw-explore-all-link">
+                <span>View All 6+ Case Studies</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* Project Grid / Showcase List */}
+        {/* 2 Featured Project Showcase Cards */}
         <div className="sw-grid">
-          {filteredProjects.map((project, index) => (
+          {FEATURED_PROJECTS.map((project, index) => (
             <Reveal
               as="article"
               key={project.id}
@@ -279,22 +207,22 @@ export function SelectedWork() {
           ))}
         </div>
 
-        {/* Bottom Studio Banner */}
-        <Reveal delay={200} className="sw-banner">
-          <div className="sw-banner-left">
-            <span className="sw-banner-badge">PROPRIETARY 3D PIPELINE</span>
-            <h4 className="sw-banner-title">Have a product or architectural concept in mind?</h4>
-            <p className="sw-banner-subtitle">
-              We design custom 3D web flagships from CAD files, 3D scans, Blender assets, or raw creative sketches.
-            </p>
-          </div>
-          <div className="sw-banner-right">
-            <a href="#contact" className="btn btn-primary btn-sm">
-              <span>Commission a Custom Build</span>
+        {/* View All Projects Action Banner */}
+        <Reveal delay={180} className="sw-view-all-banner">
+          <div className="sw-view-all-content">
+            <div>
+              <span className="sw-banner-badge">✦ FULL STUDIO PORTFOLIO</span>
+              <h4 className="sw-view-all-title">Explore our full archive of 3D spatial flagships</h4>
+              <p className="sw-view-all-desc">
+                From real-time climate GIS shaders to interactive furniture configurators and luxury audio flagships.
+              </p>
+            </div>
+            <Link href="/work" className="btn btn-primary">
+              <span>View All 6+ Case Studies</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 12h14M12 5l7 7-7 7"/>
               </svg>
-            </a>
+            </Link>
           </div>
         </Reveal>
       </div>
@@ -358,43 +286,59 @@ export function SelectedWork() {
                   </div>
                   <div className="sw-stat-box">
                     <span className="sw-stat-val">{activeModalProject.metrics.payload}</span>
-                    <span className="sw-stat-lbl">Transfer Weight</span>
+                    <span className="sw-stat-lbl">Payload</span>
                   </div>
                 </div>
               </div>
 
-              <p className="sw-modal-lead">{activeModalProject.body}</p>
+              <p className="sw-modal-tagline">&ldquo;{activeModalProject.tagline}&rdquo;</p>
+              <p className="sw-modal-desc">{activeModalProject.body}</p>
 
-              {/* Challenge vs Solution */}
-              <div className="sw-modal-breakdown">
-                <div className="sw-breakdown-card">
-                  <span className="sw-breakdown-tag is-challenge">The Creative Challenge</span>
+              {/* Challenge & Solution Grid */}
+              <div className="sw-modal-cs-grid">
+                <div className="sw-cs-card cs-challenge">
+                  <div className="sw-cs-header">
+                    <span className="sw-cs-icon">✕</span>
+                    <strong>The Engineering Challenge</strong>
+                  </div>
                   <p>{activeModalProject.challenge}</p>
                 </div>
-                <div className="sw-breakdown-card">
-                  <span className="sw-breakdown-tag is-solution">The Spatial 3D Solution</span>
+                <div className="sw-cs-card cs-solution">
+                  <div className="sw-cs-header">
+                    <span className="sw-cs-icon">✓</span>
+                    <strong>The Spatial Solution</strong>
+                  </div>
                   <p>{activeModalProject.solution}</p>
                 </div>
               </div>
 
-              {/* Technical Architecture Specs */}
+              {/* Technical Specifications Chips */}
               <div className="sw-modal-specs">
-                <span className="sw-specs-heading">Architectural & Shader Stack:</span>
-                <div className="sw-modal-spec-tags">
-                  {activeModalProject.specs.map((s) => (
-                    <span key={s} className="sw-modal-tag">{s}</span>
+                <span className="sw-modal-specs-title">Technical Disciplines &amp; Architecture:</span>
+                <div className="sw-specs-list">
+                  {activeModalProject.specs.map((spec) => (
+                    <span key={spec} className="sw-spec-tag">
+                      {spec}
+                    </span>
                   ))}
                 </div>
               </div>
 
-              {/* Modal CTA */}
+              {/* Modal Bottom Actions */}
               <div className="sw-modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setActiveModalProject(null)}
+                >
+                  Close Case Study
+                </button>
                 <a
                   href="#contact"
+                  className="btn btn-primary"
                   onClick={() => setActiveModalProject(null)}
-                  className="btn btn-primary btn-sm"
                 >
-                  <span>Discuss a Project Like {activeModalProject.name}</span>
+                  <span>Inquire About Similar Build</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>

@@ -38,7 +38,7 @@ export function Navbar() {
           ))}
         </nav>
         <div className="nav-cta">
-          <Button href="#contact" size="sm">
+          <Button href="/contact" size="sm">
             Start a Project
           </Button>
         </div>
@@ -62,7 +62,7 @@ export function Navbar() {
             </a>
           ))}
         </nav>
-        <a href="#contact" className="btn btn-primary btn-block" onClick={() => setOpen(false)}>
+        <a href="/contact" className="btn btn-primary btn-block" onClick={() => setOpen(false)}>
           <span>Start a Project</span>
         </a>
       </div>

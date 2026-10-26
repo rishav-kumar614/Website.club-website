@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <title>Website Club — Interactive Studio Concierge</title>
+  <meta name="description" content="Website Club Interactive Studio Concierge. Explore 3D website rentals, bespoke flagships, or discuss WebGL architecture."/>
+
+  <!-- Fonts: Sora & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-bg: #f4f3ef;
+      --color-bg2: #eceae4;
+      --color-fg: #0b0b0c;
+      --color-muted: #5b5c63;
+      --color-line: rgba(11, 11, 12, 0.1);
+      --color-accent: #3a64f0;
+      --phosphor-cyan: #9cb8ff;
+      --phosphor-glow: rgba(156, 184, 255, 0.65);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--color-bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--color-fg);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+    }
+
+    /* Main Stage Container */
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-bg);
+    }
+
+    /* Authentic 3D Studio Stage Frame (1920x912) */
+    .stage-frame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1920px;
+      height: 912px;
+      transform-origin: center center;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10;
+      will-change: transform;
+    }
+
+    .stage-plate {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* CRT Monitor Glass Screen Overlay (Mapped to TV glass: 980px, 300px, 366x410) */
+    .crt-screen-overlay {
+      position: absolute;
+      left: 980px;
+      top: 300px;
+      width: 366px;
+      height: 410px;
+      border-radius: 36px 36px 32px 32px;
+      overflow: hidden;
+      cursor: pointer;
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 45%, rgba(15, 18, 22, 0.25) 0%, rgba(2, 3, 5, 0.72) 100%);
+      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.85);
+      z-index: 25;
+      transition: filter 0.2s ease;
+    }
+    .crt-screen-overlay:hover {
+      filter: brightness(1.1);
+    }
+
+    /* CRT Scanlines */
+    .crt-scanlines {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 40;
+      opacity: 0.85;
+    }
+
+    /* CRT Glass Curvature Glare */
+    .crt-glare {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56%;
+      background: linear-gradient(175deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 60%, transparent 100%);
+      border-radius: 26px 26px 0 0;
+      pointer-events: none;
+      z-index: 42;
+    }
+
+    /* CRT Phosphor Noise Texture */
+    .crt-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      background-image: radial-gradient(#9cb8ff 1px, transparent 1px);
+      background-size: 6px 6px;
+      pointer-events: none;
+      z-index: 38;
+      animation: noiseDrift 6s infinite linear;
+    }
+    @keyframes noiseDrift {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(6px, 6px); }
+    }
+
+    /* [CLICK] TO START screen prompt */
+    .crt-prompt {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--phosphor-cyan);
+      text-transform: uppercase;
+      animation: crtFlicker 2.4s infinite ease-in-out;
+      text-shadow: 0 0 12px var(--phosphor-glow), 0 0 24px var(--phosphor-cyan);
+      z-index: 35;
+      text-align: center;
+      padding: 12px;
+      transition: opacity 0.3s ease;
+    }
+    @keyframes crtFlicker {
+      0%, 100% { opacity: 0.95; }
+      48% { opacity: 0.95; }
+      50% { opacity: 0.25; }
+      52% { opacity: 0.95; }
+      82% { opacity: 0.95; }
+      84% { opacity: 0.5; }
+    }
+
+    /* Glowing Phosphor Eyes */
+    .eyes-wrap {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 52px;
+      z-index: 35;
+      transition: transform 0.1s ease-out;
+    }
+
+    .crt-eye {
+      width: 78px;
+      height: 78px;
+      background: radial-gradient(circle, #ffffff 35%, #e0ecff 60%, #9cb8ff 100%);
+      border-radius: 50%;
+      box-shadow: 0 0 28px rgba(255, 255, 255, 0.95), 0 0 65px rgba(130, 185, 255, 0.85);
+      position: relative;
+      transition: transform 0.08s ease-out, height 0.12s ease;
+    }
+    .crt-eye::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.35) 50%);
+      background-size: 100% 4px;
+      border-radius: 50%;
+    }
+
+    /* Minimalist Header Navigation */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 28px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 90;
+    }
+
+    .brand-logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      color: var(--color-fg);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .brand-logo sup {
+      font-size: 0.75rem;
+      top: -0.5em;
+      opacity: 0.7;
+    }
+
+    .center-glyph {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .center-glyph:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    .glyph-svg {
+      width: 36px;
+      height: 20px;
+    }
+
+    .nav-contact {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--color-fg);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+    .nav-contact:hover {
+      color: var(--color-accent);
+    }
+
+    /* Left Minimalist Dialogue HUD Container */
+    .dialogue-hud {
+      position: fixed;
+      left: clamp(40px, 6vw, 110px);
+      top: 50%;
+      transform: translateY(-50%);
+      width: 520px;
+      max-width: 44vw;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
+    /* Minimalist Eyebrow Tag */
+    .sub-intro {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      font-weight: 600;
+    }
+
+    /* Refined Minimalist Main Speech */
+    .main-speech {
+      font-family: 'Sora', sans-serif;
+      font-size: clamp(1.75rem, 2.1vw, 2.5rem);
+      line-height: 1.25;
+      font-weight: 500;
+      letter-spacing: -0.025em;
+      color: var(--color-fg);
+      min-height: 95px;
+    }
+
+    .cursor-block {
+      display: inline-block;
+      width: 10px;
+      height: 22px;
+      background: var(--color-fg);
+      margin-left: 6px;
+      vertical-align: -2px;
+      animation: blink 0.85s infinite step-end;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Refined Minimal Pill Action Buttons */
+    .choices-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+    .choices-row.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .pill-btn {
+      background: #ffffff;
+      color: var(--color-fg);
+      border: 1px solid var(--color-line);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      outline: none;
+    }
+    .pill-btn:hover {
+      background: var(--color-fg);
+      color: #ffffff;
+      border-color: var(--color-fg);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+    .pill-btn.primary {
+      background: var(--color-accent);
+      color: #ffffff;
+      border-color: var(--color-accent);
+    }
+    .pill-btn.primary:hover {
+      background: #254cc9;
+    }
+
+    /* Minimal Bottom Reset Button */
+    .btn-reset {
+      position: fixed;
+      bottom: 32px;
+      left: 44px;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid var(--color-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 90;
+      transition: transform 0.25s ease, background 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      outline: none;
+    }
+    .btn-reset:hover {
+      transform: rotate(-180deg) scale(1.06);
+      background: var(--color-fg);
+    }
+    .btn-reset svg path {
+      transition: stroke 0.2s ease;
+    }
+    .btn-reset:hover svg path {
+      stroke: #ffffff;
+    }
+
+    /* Minimal Bottom Sound Button */
+    .sound-widget {
+      position: fixed;
+      bottom: 32px;
+      right: 44px;
+      z-index: 90;
+    }
+    .sound-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: var(--color-fg);
+      border: 1px solid var(--color-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, background 0.2s ease;
+      outline: none;
+      font-size: 14px;
+    }
+    .sound-btn:hover {
+      transform: scale(1.06);
+      background: var(--color-fg);
+      color: #ffffff;
+    }
+
+    /* Minimal Clipboard Toast */
+    .toast {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--color-fg);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 900px) {
+      .dialogue-hud {
+        left: 24px;
+        width: 90%;
+        max-width: none;
+        top: 22%;
+        transform: none;
+      }
+      .stage-frame {
+        transform: translate(-38%, -32%) scale(0.65);
+      }
+      .header {
+        padding: 20px 24px;
+      }
+      .btn-reset {
+        bottom: 24px;
+        left: 24px;
+      }
+      .sound-widget {
+        bottom: 24px;
+        right: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Minimal Header -->
+  <header class="header">
+    <a href="/" class="brand-logo">Website Club<sup>®</sup></a>
+    
+    <!-- Minimalist Center Glyph -->
+    <div class="center-glyph" onclick="triggerEasterEgg()" title="Blink">
+      <svg class="glyph-svg" viewBox="0 0 44 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 16L12 8M12 16L7 8M32 16L37 8M37 16L32 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 12C12 6.5 17 2 22 2C27 2 32 6.5 32 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M5 12H39" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <a href="mailto:hello@websiteclub.com" class="nav-contact">Let's talk</a>
+  </header>
+
+  <!-- Main Stage on Warm Website Club Canvas (#f4f3ef) -->
+  <main class="stage" id="stage">
+    
+    <!-- Coordinate-locked 1920x912 frame -->
+    <div class="stage-frame" id="stage-frame">
+      
+      <!-- Pristine Warm Canvas Stage Plate -->
+      <img src="lisa_websiteclub_stage.png" alt="Website Club Assistant" class="stage-plate" />
+
+      <!-- Interactive CRT Screen Overlay (980px, 300px, 366x410) -->
+      <div class="crt-screen-overlay" id="crt-screen" onclick="startOrInteract()">
+        <div class="crt-scanlines"></div>
+        <div class="crt-glare"></div>
+        <div class="crt-noise"></div>
+
+        <!-- Initial CRT Start Screen -->
+        <div class="crt-prompt" id="start-prompt">[CLICK] TO TALK</div>
+
+        <!-- Phosphor Headlight Eyes -->
+        <div class="eyes-wrap" id="eyes-wrap">
+          <div class="crt-eye" id="eye-left"></div>
+          <div class="crt-eye" id="eye-right"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Left Minimalist Dialogue Interface -->
+    <div class="dialogue-hud">
+      <div class="sub-intro" id="sub-intro">
+        Website Club · Interactive Concierge
+      </div>
+
+      <div class="main-speech">
+        <span id="typewriter-text"></span><span class="cursor-block" id="cursor"></span>
+      </div>
+
+      <div class="choices-row" id="choices-box">
+        <button class="pill-btn primary" onclick="selectChoice('project')">Start a project</button>
+        <button class="pill-btn" onclick="selectChoice('rent')">Rent 3D website</button>
+        <button class="pill-btn" onclick="selectChoice('transform')">Transform store</button>
+        <button class="pill-btn" onclick="selectChoice('tech')">Technical Q&A</button>
+        <button class="pill-btn" onclick="selectChoice('direct')">hello@websiteclub.com 📋</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Left: Restart Button -->
+  <button class="btn-reset" onclick="resetDialogue()" title="Restart">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M4 12C4 7.58172 7.58172 4 12 4C15.8553 4 19.0713 6.72523 19.8243 10.3478M20 12C20 16.4183 16.4183 20 12 20C8.14467 20 4.92873 17.2748 4.17572 13.6522" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M20 5V11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Bottom Right: Sound Control -->
+  <div class="sound-widget">
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()" title="Toggle Audio">
+      <span id="sound-icon">🔊</span>
+    </button>
+  </div>
+
+  <!-- Minimal Clipboard Toast -->
+  <div class="toast" id="toast">Copied hello@websiteclub.com to clipboard!</div>
+
+  <!-- Audio Synth & Minimal Typewriter Logic -->
+  <script>
+    const stageFrame = document.getElementById('stage-frame');
+    let currentScale = 1;
+
+    function resizeStage() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const baseW = 1920;
+      const baseH = 912;
+      currentScale = Math.max(vw / baseW, vh / baseH) * 1.05;
+      applyTransform(0, 0);
+    }
+    window.addEventListener('resize', resizeStage);
+
+    function applyTransform(tiltX, tiltY) {
+      stageFrame.style.transform = `translate(-50%, -50%) scale(${currentScale}) perspective(1400px) rotateY(${tiltX}deg) rotateX(${-tiltY}deg)`;
+    }
+
+    resizeStage();
+
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playBlip(freq = 480, type = 'sine', duration = 0.03, vol = 0.05) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playStartupChime() {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const notes = [440, 660, 880];
+        notes.forEach((freq, i) => {
+          setTimeout(() => {
+            playBlip(freq, 'triangle', 0.1, 0.06);
+          }, i * 85);
+        });
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('sound-icon').textContent = soundEnabled ? '🔊' : '🔇';
+    }
+
+    const textTarget = document.getElementById('typewriter-text');
+    const choicesBox = document.getElementById('choices-box');
+    const startPrompt = document.getElementById('start-prompt');
+    const eyesWrap = document.getElementById('eyes-wrap');
+    const eyeLeft = document.getElementById('eye-left');
+    const eyeRight = document.getElementById('eye-right');
+
+    let isTyping = false;
+    let started = false;
+
+    const initialSpeech = "How can we elevate your digital presence?";
+
+    function typeMessage(message, callback) {
+      isTyping = true;
+      choicesBox.classList.remove('visible');
+      textTarget.textContent = "";
+      let index = 0;
+
+      function step() {
+        if (index < message.length) {
+          textTarget.textContent += message.charAt(index);
+          const charCode = message.charCodeAt(index);
+          if (charCode > 32 && Math.random() > 0.35) {
+            playBlip(320 + (charCode % 14) * 28, 'triangle', 0.03);
+          }
+          index++;
+          setTimeout(step, Math.random() * 18 + 18);
+        } else {
+          isTyping = false;
+          if (callback) callback();
+        }
+      }
+      step();
+    }
+
+    function startOrInteract() {
+      if (!started) {
+        started = true;
+        playStartupChime();
+        startPrompt.style.display = 'none';
+        eyesWrap.style.display = 'flex';
+
+        typeMessage(initialSpeech, () => {
+          choicesBox.classList.add('visible');
+        });
+      } else {
+        blinkEyes();
+        playBlip(560, 'sine', 0.04);
+      }
+    }
+
+    // Minimal Concise Responses
+    const responses = {
+      project: "Tell us about your timeline, budget, and vision. We'll assemble an architectural blueprint within 2 hours.",
+      rent: "Turnkey 3D flagships customized for your brand and deployed in 10 days from $490/mo.",
+      transform: "We overlay a buttery 60 FPS WebGL layer onto your existing Shopify, Next.js, or WordPress store.",
+      tech: "20:1 Draco compression, offscreen Web Workers, and locked 60 FPS across mobile GPUs.",
+      direct: "Studio line: hello@websiteclub.com. We read and respond to every inquiry."
+    };
+
+    function selectChoice(key) {
+      if (isTyping) return;
+      if (key === 'direct') {
+        copyEmail();
+      }
+      const resp = responses[key];
+      if (resp) {
+        typeMessage(resp, () => {
+          choicesBox.classList.add('visible');
+        });
+      }
+    }
+
+    function resetDialogue() {
+      started = true;
+      startPrompt.style.display = 'none';
+      eyesWrap.style.display = 'flex';
+      playStartupChime();
+      typeMessage("Let's start fresh. What would you like to build?", () => {
+        choicesBox.classList.add('visible');
+      });
+    }
+
+    // 3D Parallax and Eye Tracking
+    window.addEventListener('mousemove', (e) => {
+      const { innerWidth, innerHeight } = window;
+      const normX = (e.clientX / innerWidth) - 0.5;
+      const normY = (e.clientY / innerHeight) - 0.5;
+
+      applyTransform(normX * 3.5, normY * 2.5);
+
+      const eyeOffsetX = normX * 22;
+      const eyeOffsetY = normY * 16;
+      eyeLeft.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+      eyeRight.style.transform = `translate(${eyeOffsetX}px, ${eyeOffsetY}px)`;
+    });
+
+    function blinkEyes() {
+      eyeLeft.style.height = '6px';
+      eyeRight.style.height = '6px';
+      setTimeout(() => {
+        eyeLeft.style.height = '78px';
+        eyeRight.style.height = '78px';
+      }, 150);
+    }
+
+    setInterval(() => {
+      if (started && Math.random() > 0.4) {
+        blinkEyes();
+      }
+    }, 3800);
+
+    function triggerEasterEgg() {
+      blinkEyes();
+      playBlip(980, 'sine', 0.15, 0.08);
+    }
+
+    function copyEmail() {
+      navigator.clipboard.writeText('hello@websiteclub.com');
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      playBlip(750, 'sine', 0.08);
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    setTimeout(() => {
+      if (!started) {
+        document.getElementById('typewriter-text').textContent = "Click screen to initialize concierge...";
+      }
+    }, 1200);
+  </script>
+</body>
+</html>

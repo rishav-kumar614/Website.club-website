@@ -1,12 +1,14 @@
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://websiteclub.com";
 
 export const NAV_LINKS = [
-  { label: "Websites", href: "/#websites" },
+  { label: "Templates", href: "/#templates" },
+  { label: "Rent 3D", href: "/rent" },
   { label: "Custom 3D", href: "/custom" },
-  { label: "Transform", href: "/#transform" },
-  { label: "Work", href: "/#work" },
-  { label: "Performance", href: "/#performance" },
+  { label: "Transform", href: "/transform" },
+  { label: "Work", href: "/work" },
+  { label: "Performance", href: "/performance" },
   { label: "Pricing", href: "/#pricing" },
+  { label: "Talk", href: "/contact" },
 ] as const;
 
 export const SERVICES = [
@@ -16,7 +18,7 @@ export const SERVICES = [
     title: "Rent",
     body: "Choose one of our ready-made 3D websites, customize it for your brand, connect your domain, and launch.",
     cta: "Browse Websites",
-    href: "#websites",
+    href: "/rent",
   },
   {
     id: "build",
@@ -24,7 +26,7 @@ export const SERVICES = [
     title: "Build",
     body: "We design and develop a completely original 3D website around your brand, product, and story.",
     cta: "Build My Website",
-    href: "#custom",
+    href: "/custom",
   },
   {
     id: "transform",
@@ -32,7 +34,7 @@ export const SERVICES = [
     title: "Transform",
     body: "Already have a website? We upgrade it with immersive 3D, motion, interactions, and WebGL experiences.",
     cta: "Transform My Site",
-    href: "#transform",
+    href: "/transform",
   },
 ] as const;
 

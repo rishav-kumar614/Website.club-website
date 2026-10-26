@@ -7,6 +7,11 @@ import { SelectedWork } from "@/components/SelectedWork";
 import { FinalCTA } from "@/components/FinalCTA";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { BuildStages } from "@/components/build/BuildStages";
+import { BuildProcess } from "@/components/build/BuildProcess";
+import { ScopePlanner } from "@/components/build/ScopePlanner";
+import "../transform/transform.css";
+import "./build.css";
 
 export const metadata: Metadata = {
   title: "Bespoke 3D Website Design & Custom Creative Coding | Website Club",
@@ -55,96 +60,132 @@ export default function CustomPage() {
       <Spotlight />
       <Navbar />
 
-      <main id="main">
-        {/* Bespoke Custom 3D Hero Section */}
-        <section className="section hero" aria-labelledby="custom-hero-title">
-          <div className="wrap hero-grid">
-            <div className="hero-copy">
-              <span className="hero-badge">
-                <span className="badge-dot" />
-                BESPOKE 3D WEB ENGINEERING
+      <main id="main" className="bd">
+        {/* Hero */}
+        <section className="bd-hero" aria-labelledby="custom-hero-title">
+          <div className="bd-hero-bg" aria-hidden="true">
+            <i className="c tl" />
+            <i className="c tr" />
+            <i className="c bl" />
+            <i className="c br" />
+          </div>
+          <div className="wrap bd-hero-inner">
+            <div className="bd-hero-copy">
+              <span className="bd-pill">
+                <span className="dot" />
+                Bespoke 3D web engineering
               </span>
-
-              <RevealText
-                id="custom-hero-title"
-                text="Architectural 3D Web Systems. Built from ground zero."
-                as="h1"
-                className="display hero-title"
-              />
-
-              <Reveal delay={120}>
-                <p className="lead hero-lead">
-                  We engineer completely original 3D digital flagships for visionary brands.
-                  From tailored GLSL shaders to interactive hardware explodes and real-time physics — designed to make your product unforgettable.
-                </p>
-              </Reveal>
-
-              <Reveal delay={200} className="row hero-actions">
-                <a href="#contact" className="btn btn-primary">
-                  <span>Commission a Custom Build</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+              <h1 id="custom-hero-title" className="display bd-h1">
+                <span>Original 3D.</span>
+                <span>
+                  Built from <em>ground zero.</em>
+                </span>
+              </h1>
+              <p className="lead bd-lead">
+                A fully custom 3D flagship, designed and engineered around your brand. No templates, no shared
+                components, and the code is yours.
+              </p>
+              <div className="bd-cta">
+                <a href="#planner" className="btn btn-primary">
+                  Plan my build →
                 </a>
                 <a href="#work" className="btn btn-ghost">
-                  <span>View Case Studies</span>
+                  View case studies
                 </a>
-              </Reveal>
-
-              <Reveal delay={260} className="hero-stats">
-                <div className="stat">
-                  <span className="stat-n">3-4 Wks</span>
-                  <span className="stat-l">Avg. Sprint Time</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-n">60 FPS</span>
-                  <span className="stat-l">Mobile Locked</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-n">100%</span>
-                  <span className="stat-l">Bespoke IP</span>
-                </div>
-              </Reveal>
+              </div>
             </div>
 
-            {/* The 3D Interactive Isometric Cube Hero Visual */}
-            <div className="hero-stage-col">
+            <div className="bd-hero-stage">
+              <div className="bd-dim h" aria-hidden="true">
+                <span>Zero templates</span>
+              </div>
+              <div className="bd-dim v" aria-hidden="true">
+                <span>100% your IP</span>
+              </div>
               <CubeVisual />
+              <div className="bd-chip a">Custom GLSL</div>
+              <div className="bd-chip b">3–4 week sprint</div>
+              <div className="bd-chip c">60 FPS locked</div>
             </div>
           </div>
         </section>
 
-        {/* Bespoke Capabilities Grid */}
-        <section className="section" style={{ paddingTop: 0 }}>
+        {/* Interactive build stages */}
+        <section className="section bd-sec" aria-labelledby="bd-stages-title">
           <div className="wrap">
-            <div className="service-paths-header" style={{ marginBottom: "40px" }}>
-              <div>
-                <span className="service-paths-kicker">ENGINEERING SPECIFICATIONS</span>
-                <h2 className="h2" style={{ marginTop: "8px" }}>The Custom Studio Standard</h2>
-              </div>
-              <p className="lead" style={{ maxWidth: "540px" }}>
-                Every custom commission goes through rigorous hardware-accelerated profiling to deliver an Awwwards-caliber experience.
-              </p>
+            <div className="tf-head">
+              <span className="tf-kicker">From sketch to hero quality</span>
+              <h2 id="bd-stages-title" className="h2">
+                Watch one object get built.
+              </h2>
+              <p className="lead">Scrub through the four stages every custom piece goes through, and drag to rotate.</p>
             </div>
+            <Reveal>
+              <BuildStages />
+            </Reveal>
+          </div>
+        </section>
 
-            <div className="perf-bento-grid">
+        {/* Capabilities */}
+        <section className="section bd-sec" style={{ paddingTop: 0 }} aria-labelledby="bd-caps-title">
+          <div className="wrap">
+            <div className="tf-head">
+              <span className="tf-kicker">Engineering specifications</span>
+              <h2 id="bd-caps-title" className="h2">
+                The custom studio standard.
+              </h2>
+              <p className="lead">Every commission is profiled on real hardware before it ships.</p>
+            </div>
+            <div className="bd-caps">
               {BESPOKE_CAPABILITIES.map((cap, i) => (
-                <Reveal key={cap.num} delay={i * 80} className="perf-bento-card" style={{ padding: "32px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                    <span className="perf-bento-tag">{cap.tag}</span>
-                    <span className="perf-bento-num">{cap.num}</span>
-                  </div>
-                  <h3 className="perf-bento-title" style={{ fontSize: "1.3rem", marginBottom: "10px" }}>{cap.title}</h3>
-                  <p className="perf-bento-desc" style={{ fontSize: "14px", lineHeight: "1.6", marginBottom: "20px" }}>{cap.desc}</p>
-                  <div className="perf-bento-footer">
-                    <span className="perf-bento-pill">
-                      <span className="perf-bento-pill-dot" />
+                <Reveal key={cap.num} delay={i * 70}>
+                  <article className="bd-cap">
+                    <div className="top">
+                      <span className="tag">{cap.tag}</span>
+                      <span className="num">{cap.num}</span>
+                    </div>
+                    <h3>{cap.title}</h3>
+                    <p>{cap.desc}</p>
+                    <span className="hl">
+                      <span className="d" />
                       {cap.highlight}
                     </span>
-                  </div>
+                  </article>
                 </Reveal>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Process */}
+        <section className="section bd-sec bd-dark" aria-labelledby="bd-proc-title">
+          <div className="wrap">
+            <div className="tf-head">
+              <span className="tf-kicker tf-kicker-dark">How a build runs</span>
+              <h2 id="bd-proc-title" className="h2">
+                Four weeks, four phases.
+              </h2>
+              <p className="lead">Pick a phase to see what you get. You see a private preview every week.</p>
+            </div>
+            <Reveal>
+              <BuildProcess />
+            </Reveal>
+          </div>
+        </section>
+
+        {/* Scope planner */}
+        <section id="planner" className="section bd-sec" aria-labelledby="bd-plan-title">
+          <div className="wrap">
+            <div className="tf-head">
+              <span className="tf-kicker">Plan your build</span>
+              <h2 id="bd-plan-title" className="h2">
+                Shape the scope. See the time.
+              </h2>
+              <p className="lead">Pick what you want to make and watch the timeline and complexity update.</p>
+            </div>
+            <Reveal>
+              <ScopePlanner />
+            </Reveal>
           </div>
         </section>
 

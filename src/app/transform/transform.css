@@ -1,0 +1,139 @@
+/* Transform page — uses the site's light tokens from globals.css */
+.tf-kicker {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.tf-kicker-dark { color: #8fa8ff; }
+
+.tf-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
+.tf-head .h2 { margin: 12px 0 14px; }
+.tf-head .lead { margin-inline: auto; }
+.tf-head-left { text-align: left; margin: 0; }
+.tf-head-left .lead { margin-inline: 0; }
+
+/* Before/after demo frame (used by the hero) */
+.tf-demo {
+  max-width: 1040px;
+  margin: 0 auto;
+  border-radius: 22px;
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  box-shadow: 0 40px 80px -40px var(--shadowc);
+  overflow: hidden;
+}
+.tf-demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--surf1);
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.tf-dots { display: inline-flex; gap: 6px; }
+.tf-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgb(var(--ink) / 0.18); }
+.tf-url {
+  flex: 1;
+  max-width: 320px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+}
+.tf-demo-hint { margin-left: auto; font-weight: 600; color: var(--color-fg); }
+.tf-viewport { border-radius: 0; }
+
+/* Process */
+.tf-process { background: var(--color-fg); color: #fff; border-radius: 36px; margin-inline: clamp(8px, 1.5vw, 24px); }
+.tf-process .lead { color: rgb(255 255 255 / 0.65); }
+.tf-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.tf-step {
+  height: 100%;
+  padding: 28px 24px 32px;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 0.05);
+  border: 1px solid rgb(255 255 255 / 0.1);
+}
+.tf-step-day {
+  display: inline-block;
+  margin-bottom: 36px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  font-size: 12px;
+  font-weight: 600;
+}
+.tf-step h3 { font-size: 1.3rem; letter-spacing: -0.02em; margin-bottom: 8px; }
+.tf-step p { margin: 0; font-size: 15px; line-height: 1.6; color: rgb(255 255 255 / 0.65); }
+
+/* Stacks */
+.tf-stacks-inner,
+.tf-faq-inner { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+.tf-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.tf-chips li {
+  padding: 14px 24px;
+  border-radius: 999px;
+  background: var(--color-card);
+  border: 1px solid var(--color-line);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* FAQ */
+.tf-faq { padding-top: 0; }
+.tf-faq-list { border-top: 1px solid var(--color-line); }
+.tf-faq-item { border-bottom: 1px solid var(--color-line); }
+.tf-faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 0;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.tf-faq-item summary::-webkit-details-marker { display: none; }
+.tf-faq-item summary i {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.tf-faq-item summary i::before,
+.tf-faq-item summary i::after {
+  content: "";
+  position: absolute;
+  inset: 6px 0 auto 0;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.25s;
+}
+.tf-faq-item summary i::after { transform: rotate(90deg); }
+.tf-faq-item[open] summary i::after { transform: rotate(0); }
+.tf-faq-item p { margin: 0 0 24px; max-width: 36em; color: var(--color-muted); font-size: 15.5px; line-height: 1.65; }
+
+@media (max-width: 960px) {
+  .tf-steps { grid-template-columns: repeat(2, 1fr); }
+  .tf-stacks-inner,
+  .tf-faq-inner { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .tf-steps { grid-template-columns: 1fr; }
+  .tf-demo-hint { display: none; }
+  .tf-process { border-radius: 24px; }
+}

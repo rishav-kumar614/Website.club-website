@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { WEBSITES } from "@/lib/content";
 import { Reveal, RevealText } from "./ui/Reveal";
+import { ModelViewerModal } from "./visuals/ModelViewerModal";
 
 interface RentalConfig {
   kicker: string;
@@ -68,6 +70,8 @@ const RENTAL_DETAILS: Record<string, RentalConfig> = {
 };
 
 export function FeaturedWebsites() {
+  const [activeModel, setActiveModel] = useState<"maison" | "forma" | "orbit" | null>(null);
+
   return (
     <section id="websites" className="section featured-websites-section" aria-labelledby="websites-title">
       <div className="wrap">
@@ -172,13 +176,14 @@ export function FeaturedWebsites() {
                           className="product-screen-image"
                           priority={i === 0}
                         />
-                        <a
-                          href="#contact"
+                        <button
+                          type="button"
+                          onClick={() => setActiveModel(w.id as "maison" | "forma" | "orbit")}
                           className="product-hover-overlay"
-                          aria-label={`Preview interactive 3D model for ${w.name}`}
+                          aria-label={`Launch interactive 3D model simulation for ${w.name}`}
                         >
                           <span className="hover-demo-btn">
-                            <span>Launch Live Model</span>
+                            <span>Launch Live 3D Model</span>
                             <svg viewBox="0 0 16 16" fill="none" className="hover-arrow" aria-hidden="true">
                               <path
                                 d="M3.5 12.5L12.5 3.5M12.5 3.5H6.5M12.5 3.5V9.5"
@@ -189,7 +194,7 @@ export function FeaturedWebsites() {
                               />
                             </svg>
                           </span>
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -244,8 +249,13 @@ export function FeaturedWebsites() {
                         />
                       </svg>
                     </a>
-                    <a href="#contact" className="product-cta-secondary">
-                      <span>Live Demo</span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveModel(w.id as "maison" | "forma" | "orbit")}
+                      className="product-cta-secondary"
+                      aria-label={`Launch 3D simulation for ${w.name}`}
+                    >
+                      <span>Interactive 3D Demo</span>
                       <svg viewBox="0 0 16 16" fill="none" className="secondary-arrow" aria-hidden="true">
                         <path
                           d="M3 8H13M13 8L9 4M13 8L9 12"
@@ -255,7 +265,7 @@ export function FeaturedWebsites() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                    </a>
+                    </button>
                   </div>
                 </Reveal>
               </article>
@@ -263,54 +273,40 @@ export function FeaturedWebsites() {
           })}
         </div>
 
-        {/* Integrated 4-Step Rental Launch Ribbon */}
-        <Reveal delay={200} className="rental-flow-ribbon">
-          <div className="flow-ribbon-header">
-            <div className="flow-ribbon-tag">
-              <span className="flow-ribbon-dot" />
-              <span>HOW RENTING WORKS</span>
+        {/* Deep Dive Collection Banner linking to /rent */}
+        <Reveal delay={200} className="featured-catalog-cta-banner">
+          <div className="catalog-cta-ambient" aria-hidden="true" />
+          <div className="catalog-cta-inner">
+            <div className="catalog-cta-left">
+              <span className="catalog-cta-tag">✦ THE FULL 3D RENTAL COLLECTION</span>
+              <h3 className="catalog-cta-title">Want to test and compare all 3D flagships?</h3>
+              <p className="catalog-cta-desc">
+                Explore our full catalog on the dedicated Rentals page — complete with category filters, full-screen 3D model sandboxes, launch timelines, and complete licensing FAQs.
+              </p>
             </div>
-            <h4 className="flow-ribbon-title">Zero Upfront Build Cost · Live in 48 Hours</h4>
-          </div>
-          <div className="flow-ribbon-grid">
-            <div className="flow-ribbon-step">
-              <div className="flow-step-num-wrap">
-                <span className="flow-step-num">01</span>
-                <span className="flow-step-timeline">Hour 0</span>
-              </div>
-              <h5 className="flow-step-title">Select Flagship</h5>
-              <p className="flow-step-desc">Pick an award-winning 3D architecture tailored to your brand &amp; industry.</p>
-            </div>
-
-            <div className="flow-ribbon-step">
-              <div className="flow-step-num-wrap">
-                <span className="flow-step-num">02</span>
-                <span className="flow-step-timeline">&lt; 24 Hours</span>
-              </div>
-              <h5 className="flow-step-title">Brand Tailoring</h5>
-              <p className="flow-step-desc">We inject your exact colors, typography, product copy, and shader lighting.</p>
-            </div>
-
-            <div className="flow-ribbon-step">
-              <div className="flow-step-num-wrap">
-                <span className="flow-step-num">03</span>
-                <span className="flow-step-timeline">Hour 48</span>
-              </div>
-              <h5 className="flow-step-title">Domain &amp; Launch</h5>
-              <p className="flow-step-desc">Connect your custom domain with instant automated SSL, DNS &amp; edge CDN.</p>
-            </div>
-
-            <div className="flow-ribbon-step">
-              <div className="flow-step-num-wrap">
-                <span className="flow-step-num">04</span>
-                <span className="flow-step-timeline">Continuous</span>
-              </div>
-              <h5 className="flow-step-title">Managed Cloud</h5>
-              <p className="flow-step-desc">Zero dev overhead. 99.9% uptime, GPU maintenance &amp; browser tuning included.</p>
+            <div className="catalog-cta-right">
+              <a href="/rent" className="catalog-cta-button">
+                <span>View Full Rental Catalog</span>
+                <svg viewBox="0 0 16 16" fill="none" className="catalog-cta-arrow" aria-hidden="true">
+                  <path
+                    d="M3.5 12.5L12.5 3.5M12.5 3.5H6.5M12.5 3.5V9.5"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
             </div>
           </div>
         </Reveal>
       </div>
+
+      {/* Fullscreen Interactive 3D Model Viewer Modal */}
+      <ModelViewerModal
+        modelId={activeModel}
+        onClose={() => setActiveModel(null)}
+      />
     </section>
   );
 }

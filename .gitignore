@@ -7,3 +7,7 @@ next-env.d.ts
 *.tsbuildinfo
 .agents
 .claude
+
+# local scratch / logs
+dev.log
+scratch_*.py

@@ -3,41 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { useInView } from "@/lib/hooks";
-import { Reveal, RevealText } from "./ui/Reveal";
-import { ButterflyVisual } from "./visuals/SceneHosts";
-
-const UPGRADE_FEATURES = [
-  {
-    num: "01",
-    title: "Interactive 3D Hero Worlds",
-    desc: "Replace flat banners with real-time 3D canvas viewports that react dynamically to pointer physics and camera angles.",
-  },
-  {
-    num: "02",
-    title: "Exploded 3D Product Anatomy",
-    desc: "Allow customers to deconstruct products into internal components, inspect materials, and rotate 360° in real-time.",
-  },
-  {
-    num: "03",
-    title: "Kinetic GSAP Scroll Choreography",
-    desc: "Transform static vertical scrolling into a cinematic timeline with pinned stages, camera pans, and scrubbed animations.",
-  },
-  {
-    num: "04",
-    title: "Volumetric Shaders & Caustics",
-    desc: "Custom GLSL fragment shaders simulating realistic light refraction, water reflections, glass absorption, and particle fields.",
-  },
-  {
-    num: "05",
-    title: "Zero Stack Migration",
-    desc: "Keep your current CMS, Shopify store, Next.js or WordPress stack intact. We inject 3D layers via modular edge components.",
-  },
-  {
-    num: "06",
-    title: "Lighthouse 95+ Performance",
-    desc: "Headless GPU lifecycle management and progressive asset streaming ensure blazing-fast load times with zero SEO penalties.",
-  },
-];
+import { Reveal, RevealText, MotionStaggerContainer, MotionStaggerItem, motion } from "./ui/Reveal";
 
 export function Transformation() {
   const [pos, setPos] = useState(50);
@@ -68,7 +34,7 @@ export function Transformation() {
         {/* Section Header */}
         <div className="transform-header">
           <div className="transform-header-left">
-            <span className="transform-kicker">✦ 3D WEB RETROFIT</span>
+            <span className="transform-kicker">✦ 3D WEB RETROFIT &amp; SPATIAL UPGRADE</span>
             <RevealText
               id="transform-title"
               text="Already have a website? Elevate it into the 3rd dimension."
@@ -137,7 +103,8 @@ export function Transformation() {
                     priority
                   />
                   <div className="ba-layer-watermark watermark-before">
-                    <span>STANDARD 2D WEB</span>
+                    <span className="watermark-badge">BEFORE</span>
+                    <span className="watermark-sub">Flat 2D UI · Static PNG Photos · Generic Scroll</span>
                   </div>
                 </div>
 
@@ -145,25 +112,25 @@ export function Transformation() {
                 <div className="ba-layer ba-layer-after" aria-hidden="true">
                   <Image
                     src="/transform_after.jpg"
-                    alt="Upgraded 3D WebGL spatial website experience"
+                    alt="Upgraded 3D spatial WebGL experience with volumetric lighting"
                     fill
                     className="ba-img"
                     priority
                   />
                   <div className="ba-layer-watermark watermark-after">
-                    <span className="watermark-sparkle">✦</span>
-                    <span>3D SPATIAL WEBGL · 60 FPS</span>
+                    <span className="watermark-badge">AFTER UPGRADE</span>
+                    <span className="watermark-sub">Spatial WebGL · 360° Inspection · Volumetric Shaders · 60 FPS</span>
                   </div>
                 </div>
 
-                {/* Draggable Divider Handle Line */}
-                <div className="ba-divider-line" aria-hidden="true">
-                  <div className="ba-handle-grip">
-                    <svg viewBox="0 0 20 20" fill="none" className="grip-arrows" aria-hidden="true">
+                {/* Slider Handle Divider Line */}
+                <div className="ba-divider" aria-hidden="true">
+                  <div className="ba-handle">
+                    <svg className="ba-handle-arrows" viewBox="0 0 24 24" fill="none">
                       <path
-                        d="M6.5 6L2.5 10L6.5 14M13.5 6L17.5 10L13.5 14"
+                        d="M8 7L3 12L8 17M16 7L21 12L16 17"
                         stroke="currentColor"
-                        strokeWidth="1.8"
+                        strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
@@ -171,13 +138,15 @@ export function Transformation() {
                   </div>
                 </div>
 
-                {/* Accessible Range Input */}
+                {/* Accessible Range Input Control */}
                 <input
                   type="range"
-                  min={0}
-                  max={100}
-                  step={0.5}
+                  min="0"
+                  max="100"
                   value={pos}
+                  onPointerDown={() => {
+                    touched.current = true;
+                  }}
                   onChange={(e) => {
                     touched.current = true;
                     setPos(Number(e.target.value));
@@ -196,64 +165,309 @@ export function Transformation() {
           </div>
         </Reveal>
 
-        {/* Live 3D Metamorphosis Specimen Showcase: 3D Butterfly */}
-        <Reveal delay={120} className="transform-butterfly-showcase">
-          <div className="butterfly-showcase-card">
-            <div className="butterfly-card-glow" aria-hidden="true" />
-            <div className="butterfly-showcase-grid">
-              <div className="butterfly-info-pane">
-                <div className="butterfly-badge">
-                  <span className="badge-pulse" />
-                  <span>3D METAMORPHOSIS ENGINE</span>
+        {/* Streamlined Architecture Console Linking to /transform */}
+        <Reveal delay={120} className="transform-architecture-preview">
+          <div className="arch-preview-card">
+            <div className="arch-preview-glow" aria-hidden="true" />
+            <div className="arch-preview-content">
+              {/* Header with Title + Description + Live Bridge Compatibility Box */}
+              <div className="arch-preview-header">
+                <div className="arch-preview-hgroup">
+                  <div className="arch-pill-tag">
+                    <span className="pill-dot-pulse" />
+                    <span>MODULAR RETROFIT ENGINE</span>
+                  </div>
+                  <h3 className="arch-preview-title">
+                    6 Layers of Spatial Craft.<br />
+                    <span className="arch-title-gradient">Zero Stack Migration.</span>
+                  </h3>
+                  <p className="arch-preview-desc">
+                    We don&apos;t rebuild your backend or disrupt your live business. We engineer a high-performance WebGL layer directly into your existing Shopify, Next.js, or WordPress storefront — delivering 60 FPS spatial interactions without sacrificing SEO or checkout flow.
+                  </p>
                 </div>
-                <h3 className="butterfly-title">
-                  From Flat Canvas to Living Spatial Biology
-                </h3>
-                <p className="butterfly-desc">
-                  Every 3D upgrade is custom-engineered with real-time procedural physics. Interact with this living butterfly specimen — rendered with organic dual-pivot wing flutter, iridescent procedural lighting, and live cursor guidance.
-                </p>
-                <div className="butterfly-specs-row">
-                  <div className="bf-spec">
-                    <span className="bf-spec-val">60 FPS</span>
-                    <span className="bf-spec-lbl">Fluid Flight</span>
+
+                <div className="arch-compat-card">
+                  <div className="compat-header-bar">
+                    <span className="compat-label">
+                      <svg viewBox="0 0 16 16" fill="none" width="13" height="13" stroke="currentColor">
+                        <path d="M2 4L8 1L14 4V12L8 15L2 12V4Z" strokeWidth="1.4" strokeLinejoin="round" />
+                      </svg>
+                      DROP-IN COMPATIBILITY
+                    </span>
+                    <span className="compat-live-status">
+                      <span className="pill-dot-pulse" style={{ background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+                      LIVE BRIDGE
+                    </span>
                   </div>
-                  <div className="bf-spec">
-                    <span className="bf-spec-val">Dual Pivot</span>
-                    <span className="bf-spec-lbl">Wing Kinetics</span>
+                  <div className="compat-chips-row">
+                    <span className="compat-chip">
+                      <span className="compat-chip-dot green" />
+                      Shopify Plus
+                    </span>
+                    <span className="compat-chip">
+                      <span className="compat-chip-dot cyan" />
+                      Next.js
+                    </span>
+                    <span className="compat-chip">
+                      <span className="compat-chip-dot blue" />
+                      WordPress
+                    </span>
+                    <span className="compat-chip">
+                      <span className="compat-chip-dot purple" />
+                      Webflow
+                    </span>
+                    <span className="compat-chip">
+                      <span className="compat-chip-dot amber" />
+                      Headless API
+                    </span>
                   </div>
-                  <div className="bf-spec">
-                    <span className="bf-spec-val">WebGL</span>
-                    <span className="bf-spec-lbl">Real-time Shaders</span>
+                  <div className="compat-subtext">
+                    <svg viewBox="0 0 16 16" fill="none" width="12" height="12" stroke="currentColor">
+                      <circle cx="8" cy="8" r="6" strokeWidth="1.2" />
+                      <path d="M8 5V8.5L10 10.5" strokeWidth="1.2" strokeLinecap="round" />
+                    </svg>
+                    <span>Zero downtime • Existing cart, blog &amp; SEO untouched</span>
                   </div>
-                </div>
-                <div className="butterfly-interactive-hint">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 8v8M8 12h8" />
-                  </svg>
-                  <span>Move your mouse across the viewport to guide flight angle</span>
                 </div>
               </div>
-              <div className="butterfly-viewport-pane">
-                <ButterflyVisual />
+
+              {/* 6 Modular Layer Bento Cards with Rich Telemetry Widgets */}
+              <MotionStaggerContainer className="arch-layers-grid" stagger={0.07}>
+                {/* 01 GLSL Shader Physics */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <circle cx="10" cy="10" r="7" strokeWidth="1.5" strokeDasharray="3 3" />
+                            <path d="M10 4V16M4 10H16" strokeWidth="1.5" strokeLinecap="round" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">60 FPS SHADER</span>
+                      </div>
+                      <span className="arch-layer-num">01</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>GLSL Shader Physics</strong>
+                      <span>Volumetric caustics, optical refraction &amp; custom raymarched surfaces</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <div className="widget-wave-bar">
+                        <span className="wave-bar" />
+                        <span className="wave-bar" />
+                        <span className="wave-bar" />
+                        <span className="wave-bar" />
+                        <span className="wave-bar" />
+                        <span className="wave-bar" />
+                      </div>
+                      <span>GLSL 3.0 Raymarching</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+
+                {/* 02 Kinetic GSAP Scroll */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <path d="M4 14L8 10L12 14L16 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <circle cx="16" cy="6" r="2" fill="currentColor" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">FRAME-ACCURATE</span>
+                      </div>
+                      <span className="arch-layer-num">02</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>Kinetic GSAP Scroll</strong>
+                      <span>Frame-accurate camera choreography synchronized with scroll physics</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <div className="widget-timeline-bar">
+                        <div className="timeline-scrub-track">
+                          <span className="timeline-scrub-head" />
+                        </div>
+                        <span style={{ fontSize: '10px' }}>0.0s ➔ 1.8s</span>
+                      </div>
+                      <span>ScrollTrigger Pin</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+
+                {/* 03 360° Rotatable WebGL */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <path d="M10 2L17 6V14L10 18L3 14V6L10 2Z" strokeWidth="1.5" strokeLinejoin="round" />
+                            <path d="M10 2V18M3 6L17 14M17 6L3 14" strokeWidth="1" strokeOpacity="0.4" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">DRACO 1.2MB</span>
+                      </div>
+                      <span className="arch-layer-num">03</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>360° Rotatable WebGL</strong>
+                      <span>Ultra-smooth Draco-compressed CAD/glTF models with HDR lighting</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <span style={{ color: '#38bdf8' }}>360° • X:42° Y:18°</span>
+                      <span>HDR Environment</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+
+                {/* 04 Zero-CMS Rebuild */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <rect x="4" y="4" width="12" height="12" rx="3" strokeWidth="1.5" />
+                            <path d="M4 9H16M9 4V16" strokeWidth="1.2" strokeOpacity="0.5" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">ZERO REBUILD</span>
+                      </div>
+                      <span className="arch-layer-num">04</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>Zero-CMS Rebuild</strong>
+                      <span>100% preserves Shopify checkout, inventory, blog &amp; current SEO rankings</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <span className="widget-bridge-pill">
+                        <span className="compat-chip-dot green" />
+                        Live Bridge Hook
+                      </span>
+                      <span>0 Redirects</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+
+                {/* 05 Spatial Audio Engine */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <path d="M3 8V12H6L10 16V4L6 8H3Z" strokeWidth="1.5" strokeLinejoin="round" />
+                            <path d="M13 7C14.5 8.5 14.5 11.5 13 13M15.5 5C18 7.5 18 12.5 15.5 15" strokeWidth="1.3" strokeLinecap="round" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">3D BINAURAL</span>
+                      </div>
+                      <span className="arch-layer-num">05</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>Spatial Audio Engine</strong>
+                      <span>Positional WebAudio frequency cues &amp; tactile micro-interactions</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <div className="widget-wave-bar">
+                        <span className="wave-bar" style={{ animationDelay: '0.4s' }} />
+                        <span className="wave-bar" style={{ animationDelay: '0.1s' }} />
+                        <span className="wave-bar" style={{ animationDelay: '0.3s' }} />
+                        <span className="wave-bar" style={{ animationDelay: '0.2s' }} />
+                      </div>
+                      <span>WebAudio 48kHz</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+
+                {/* 06 Universal GPU Fallbacks */}
+                <MotionStaggerItem>
+                  <motion.div
+                    className="arch-layer-chip"
+                    whileHover={{ y: -5, transition: { type: "spring", stiffness: 400, damping: 25 } }}
+                  >
+                    <div className="arch-layer-top">
+                      <div className="arch-layer-icon-wrap">
+                        <div className="arch-layer-icon">
+                          <svg viewBox="0 0 20 20" fill="none" width="18" height="18" stroke="currentColor">
+                            <path d="M10 2L16 5V10C16 14.5 10 18 10 18C10 18 4 14.5 4 10V5L10 2Z" strokeWidth="1.5" strokeLinejoin="round" />
+                            <path d="M8 10L10 12L13 8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                        <span className="arch-layer-pill-tag">DUAL ENGINE</span>
+                      </div>
+                      <span className="arch-layer-num">06</span>
+                    </div>
+                    <div className="arch-layer-info">
+                      <strong>Universal GPU Fallbacks</strong>
+                      <span>Dual-threaded offscreen canvas with instant 60 FPS CSS 3D fallback</span>
+                    </div>
+                    <div className="arch-layer-widget">
+                      <span>WebGL 2.0 ⇄ CSS3D</span>
+                      <span style={{ color: '#10b981', fontWeight: 600 }}>100% Pass Rate</span>
+                    </div>
+                  </motion.div>
+                </MotionStaggerItem>
+              </MotionStaggerContainer>
+
+              {/* Action Strip with High-Trust Badges */}
+              <div className="arch-preview-footer">
+                <div className="arch-trust-strip">
+                  <div className="arch-trust-item">
+                    <span className="arch-trust-dot" />
+                    <span>10-Day Delivery Sprint</span>
+                  </div>
+                  <div className="arch-trust-item">
+                    <span className="arch-trust-dot" />
+                    <span>Lighthouse 95+ Guarantee</span>
+                  </div>
+                  <div className="arch-trust-item">
+                    <span className="arch-trust-dot" />
+                    <span>100% SEO Retained</span>
+                  </div>
+                </div>
+
+                <motion.a
+                  href="/transform"
+                  className="arch-explore-btn"
+                  whileHover={{ scale: 1.03, y: -2, transition: { type: "spring", stiffness: 420, damping: 20 } }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <span>Explore Full 3D Retrofit Architecture &amp; Case Study</span>
+                  <span className="arch-btn-arrow">
+                    <svg viewBox="0 0 16 16" fill="none" width="13" height="13">
+                      <path
+                        d="M3.5 12.5L12.5 3.5M12.5 3.5H6.5M12.5 3.5V9.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                </motion.a>
               </div>
             </div>
           </div>
         </Reveal>
-
-        {/* 6-Item Upgrade Capabilities Grid */}
-        <div className="transform-features-grid">
-          {UPGRADE_FEATURES.map((feat, fIdx) => (
-            <Reveal key={feat.num} delay={100 + fIdx * 50} className="transform-feature-card" spot>
-              <div className="feat-top">
-                <span className="feat-num">{feat.num}</span>
-                <span className="feat-indicator" />
-              </div>
-              <h4 className="feat-title">{feat.title}</h4>
-              <p className="feat-desc">{feat.desc}</p>
-            </Reveal>
-          ))}
-        </div>
 
         {/* Bottom Complimentary Concept Callout */}
         <Reveal delay={250} className="transform-callout-banner">

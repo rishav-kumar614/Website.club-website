@@ -284,6 +284,29 @@ export function Footer() {
             </button>
           </div>
         </div>
+
+        <div className="footer-credit-row">
+          {/* Site credits */}
+          <div className="site-credit" aria-label="Site credits">
+            <a href="https://fabulousmedia.in/" target="_blank" rel="noopener" title="Designed by Fabulous Media">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://www.google.com/s2/favicons?domain=fabulousmedia.in&sz=64"
+                alt="Fabulous Media"
+                loading="lazy"
+              />
+            </a>
+            <span className="divider" aria-hidden="true" />
+            <a href="https://gocommercially.com/" target="_blank" rel="noopener" title="Powered by GoCommercially">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://www.google.com/s2/favicons?domain=gocommercially.com&sz=64"
+                alt="GoCommercially"
+                loading="lazy"
+              />
+            </a>
+          </div>
+        </div>
       </div>
     </footer>
   );

@@ -1,0 +1,147 @@
+/* Transform page — hero: centered headline, tilted before/after demo that straightens on scroll, floating feature cards */
+.tf-hero2 { position: relative; padding: clamp(120px, 12vw, 150px) 0 clamp(64px, 8vw, 110px); overflow: clip; }
+.tf-hero2-inner { position: relative; }
+
+/* backdrop: soft glow + perspective grid floor */
+.tf-hero2-bg { position: absolute; inset: 0; pointer-events: none; }
+.tf-hero2-glow {
+  position: absolute; left: 50%; top: 46%; width: min(1300px, 130vw); height: 820px; translate: -50% 0;
+  background: radial-gradient(closest-side, rgb(var(--acc) / 0.16), transparent 72%);
+}
+.tf-hero2-floor {
+  position: absolute; left: -25%; right: -25%; top: 52%; height: 80%;
+  background:
+    linear-gradient(rgb(var(--ink) / 0.07) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgb(var(--ink) / 0.07) 1px, transparent 1px) 0 0 / 64px 64px;
+  transform: perspective(700px) rotateX(64deg); transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 50%, transparent 85%);
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 50%, transparent 85%);
+}
+
+/* ---------- copy ---------- */
+.tf-hero2-copy { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 1100px; margin: 0 auto; }
+
+.tf-pill {
+  display: inline-flex; align-items: center; gap: 10px; padding: 5px 14px 5px 5px; border-radius: 999px;
+  font-size: 13.5px; font-weight: 600; color: var(--color-fg);
+  background: var(--color-card); border: 1px solid var(--color-line); box-shadow: 0 8px 20px -14px var(--shadowc);
+  transition: transform 0.3s cubic-bezier(0.34, 1.6, 0.5, 1), box-shadow 0.3s;
+  animation: tf-fade-up 0.7s both;
+}
+.tf-pill .new { padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.04em; background: var(--color-accent); color: #fff; }
+.tf-pill .arr { transition: transform 0.3s; }
+.tf-pill:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -16px var(--shadowc); }
+.tf-pill:hover .arr { transform: translateX(4px); }
+
+.tf-hero2-h1 { margin: 24px 0 22px; font-size: clamp(2.7rem, 6vw, 5.6rem); line-height: 1; letter-spacing: -0.045em; perspective: 900px; }
+.tf-hero2-h1 .line { display: block; }
+.tf-hero2-h1 .w {
+  display: inline-block; transform-origin: 50% 100%;
+  animation: tf-word 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--k) * 70ms + 120ms);
+}
+@keyframes tf-word {
+  from { opacity: 0; transform: translateY(0.45em) rotateX(-50deg); filter: blur(10px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* "third dimension": extruded type, the extrusion leans away from the cursor */
+.tf-3d-word {
+  --ex: calc(var(--hx) * -1.4px);
+  --ey: calc(var(--hy) * -1.4px);
+  color: #4b74ff;
+  text-shadow:
+    calc(var(--ex) * 1) calc(var(--ey) * 1) 0 #3f68f2,
+    calc(var(--ex) * 2) calc(var(--ey) * 2) 0 #375ee4,
+    calc(var(--ex) * 3) calc(var(--ey) * 3) 0 #3054d3,
+    calc(var(--ex) * 4) calc(var(--ey) * 4) 0 #2a4ac2,
+    calc(var(--ex) * 5) calc(var(--ey) * 5) 0 #2441b0,
+    calc(var(--ex) * 6) calc(var(--ey) * 6) 0 #1e389e,
+    calc(var(--ex) * 9) calc(var(--ey) * 12) 22px rgb(58 100 240 / 0.3);
+  transition: text-shadow 0.3s ease-out;
+}
+
+/* a tiny spinning cube stands in for the full stop */
+.tf-mini-cube {
+  display: inline-block; width: 0.3em; height: 0.3em; margin-left: 0.12em; perspective: 260px;
+  animation: tf-word 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--k) * 70ms + 120ms);
+}
+.tf-mini-cube .cube { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; animation: tf-spin 7s linear infinite; }
+.tf-mini-cube i { position: absolute; inset: 0; border-radius: 0.04em; background: var(--color-accent); border: 1px solid rgb(255 255 255 / 0.45); }
+.tf-mini-cube i:nth-child(1) { transform: translateZ(0.15em); }
+.tf-mini-cube i:nth-child(2) { transform: rotateY(90deg) translateZ(0.15em); background: #6f8dff; }
+.tf-mini-cube i:nth-child(3) { transform: rotateY(180deg) translateZ(0.15em); }
+.tf-mini-cube i:nth-child(4) { transform: rotateY(-90deg) translateZ(0.15em); background: #6f8dff; }
+.tf-mini-cube i:nth-child(5) { transform: rotateX(90deg) translateZ(0.15em); background: #a9bbff; }
+.tf-mini-cube i:nth-child(6) { transform: rotateX(-90deg) translateZ(0.15em); background: #1d3aa8; }
+@keyframes tf-spin { from { transform: rotateX(-24deg) rotateY(0deg); } to { transform: rotateX(-24deg) rotateY(360deg); } }
+
+.tf-hero2-lead { max-width: 40em; margin: 0 auto; animation: tf-fade-up 0.8s 0.55s both; }
+.tf-hero2-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; animation: tf-fade-up 0.8s 0.65s both; }
+@keyframes tf-fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+/* ---------- demo stage ---------- */
+.tf-hs { position: relative; max-width: 1080px; margin: clamp(48px, 6vw, 72px) auto 0; perspective: 2000px; animation: tf-fade-up 1s 0.45s both; }
+.tf-hs-frame {
+  transform-origin: 50% 0;
+  transform: rotateX(calc((1 - var(--t)) * 24deg)) rotateY(calc(var(--hx) * 2.5deg)) scale(calc(0.92 + var(--t) * 0.08));
+  transition: transform 0.2s ease-out;
+}
+.tf-hs-frame .tf-demo {
+  max-width: none;
+  box-shadow: 0 70px 120px -50px rgb(30 50 140 / 0.45), 0 30px 60px -40px var(--shadowc);
+}
+.tf-demo-hint { display: inline-flex; align-items: center; gap: 8px; }
+.tf-demo-hint .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); animation: tf-ping 1.6s ease-out infinite; }
+@keyframes tf-ping { 0% { box-shadow: 0 0 0 0 rgb(var(--acc) / 0.55); } 100% { box-shadow: 0 0 0 9px rgb(var(--acc) / 0); } }
+
+/* floating feature cards: parallax with the cursor (transform), bob (translate), pop in (scale) */
+.tf-float {
+  --c: var(--color-accent);
+  position: absolute; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 11px 16px 11px 11px; border-radius: 18px;
+  background: rgb(255 255 255 / 0.85); border: 1px solid rgb(255 255 255 / 0.9); backdrop-filter: blur(12px);
+  box-shadow: 0 0 0 1px var(--color-line), 0 26px 44px -24px var(--shadowc);
+  transform: translate3d(calc(var(--hx) * var(--z) * -16px), calc(var(--hy) * var(--z) * -12px), 0);
+  transition: transform 0.4s ease-out;
+  animation: tf-float-in 0.8s cubic-bezier(0.34, 1.5, 0.5, 1) both, tf-bob 5s ease-in-out infinite;
+  animation-delay: calc(0.95s + var(--i) * 0.12s), calc(var(--i) * -1.3s);
+}
+.tf-float.l1 { left: -7%; top: 16%; }
+.tf-float.l2 { left: -4%; bottom: 12%; --c: #f59e0b; }
+.tf-float.r1 { right: -7%; top: 6%; }
+.tf-float.r2 { right: -4%; bottom: 20%; --c: #22a65e; }
+.tf-float .ic {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; flex: none;
+  color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff);
+}
+.tf-float .tx { display: flex; flex-direction: column; text-align: left; line-height: 1.25; }
+.tf-float .tx b { font-size: 14px; }
+.tf-float .tx span { font-size: 12px; color: var(--color-muted); }
+@keyframes tf-float-in { from { opacity: 0; scale: 0.7; } to { opacity: 1; scale: 1; } }
+@keyframes tf-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+
+/* trust row under the demo */
+.tf-hero2-stack {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 16px; margin-top: 44px;
+  font-size: 13px; font-weight: 600; color: var(--color-muted);
+}
+.tf-hero2-stack ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.tf-hero2-stack li {
+  padding: 5px 13px; border-radius: 999px; font-weight: 700; color: var(--color-fg);
+  background: rgb(255 255 255 / 0.6); border: 1px solid var(--color-line);
+}
+
+@media (max-width: 1240px) {
+  .tf-float.l1, .tf-float.l2 { left: -2%; }
+  .tf-float.r1, .tf-float.r2 { right: -2%; }
+}
+@media (max-width: 960px) {
+  .tf-float { display: none; }
+}
+@media (max-width: 600px) {
+  .tf-hero2-h1 { font-size: clamp(2.3rem, 11vw, 3.2rem); }
+  .tf-hs-frame { transform: rotateX(calc((1 - var(--t)) * 14deg)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tf-pill, .tf-hero2-h1 .w, .tf-mini-cube, .tf-hero2-lead, .tf-hero2-cta, .tf-hs, .tf-float, .tf-demo-hint .dot { animation: none; }
+  .tf-mini-cube .cube { animation: none; transform: rotateX(-24deg) rotateY(35deg); }
+}

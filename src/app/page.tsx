@@ -2,14 +2,14 @@ import { FAQ as FAQ_ITEMS, SITE_URL } from "@/lib/content";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { ServicePaths } from "@/components/ServicePaths";
-import { FeaturedWebsites } from "@/components/FeaturedWebsites";
 import { Transformation } from "@/components/Transformation";
-import { SelectedWork } from "@/components/SelectedWork";
-import { Performance } from "@/components/Performance";
+import { TemplatesLibrary } from "@/components/TemplatesLibrary";
+import { RubiksCubeSection } from "@/components/RubiksCubeSection";
 import { PricingPreview } from "@/components/PricingPreview";
 import { FAQ } from "@/components/FAQ";
 import { FinalCTA } from "@/components/FinalCTA";
 import { Footer } from "@/components/Footer";
+import Discover from "@/components/discover/Discover";
 import { Marquee } from "@/components/Marquee";
 import { Spotlight } from "@/components/ui/Spotlight";
 import { SmoothScroll } from "@/components/ui/SmoothScroll";
@@ -60,12 +60,12 @@ export default function Home() {
       <Navbar />
       <main id="main">
         <Hero />
+        <Discover />
         <Marquee />
         <ServicePaths />
-        <FeaturedWebsites />
+        <TemplatesLibrary />
         <Transformation />
-        <SelectedWork />
-        <Performance />
+        <RubiksCubeSection />
         <PricingPreview />
         <FAQ />
         <FinalCTA />
