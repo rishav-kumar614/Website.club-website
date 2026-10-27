@@ -1,40 +1,39 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { use3DCapability, useInView } from "@/lib/hooks";
-import { EyeFallback } from "./EyeFallback";
 import { Tilt } from "./Tilt";
 
 // Heavy scenes are separate chunks, fetched only after idle + capability checks.
-const HeroScene = dynamic(() => import("./scenes/HeroScene"), { ssr: false });
+const Robot = dynamic(() => import("@/app/contact/Robot").then((m) => m.Robot), { ssr: false });
 const CubeScene = dynamic(() => import("./scenes/CubeScene"), { ssr: false });
 const FinalScene = dynamic(() => import("./scenes/FinalScene"), { ssr: false });
 const ButterflyScene = dynamic(() => import("./scenes/ButterflyScene"), { ssr: false });
 import { CubeFallback } from "./CubeFallback";
 
 /**
- * Hero visual. The CSS-3D fallback renders immediately (so first paint is complete
- * and it is the permanent visual on low-power / reduced-motion devices);
- * the WebGL scene fades in over it once it has initialised.
+ * Hero visual: the contact-page robot. Clicking it opens the assistant on /contact.
+ * Its eyes follow the cursor via --ex/--ey on the host element.
  */
 export function HeroVisual() {
-  const cap = use3DCapability();
-  const [ref, visible] = useInView<HTMLDivElement>({ once: false, margin: "80px" });
-  const [ready, setReady] = useState(false);
+  const host = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      host.current?.style.setProperty("--ex", String((e.clientX / innerWidth - 0.5) * 16));
+      host.current?.style.setProperty("--ey", String((e.clientY / innerHeight - 0.5) * 10));
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, []);
 
   return (
-    <div ref={ref} className="hero-visual">
-      <div className={`hero-fallback ${ready ? "off" : ""}`}>
-        <Tilt max={8}>
-          <EyeFallback />
-        </Tilt>
-      </div>
-      {cap.enabled && (
-        <div className={`canvas-wrap ${ready ? "on" : ""}`}>
-          <HeroScene lite={cap.lite} active={visible} onReady={() => setReady(true)} />
-        </div>
-      )}
+    <div className="hero-visual">
+      <Link ref={host} href="/contact" className="canvas-wrap on" style={{ transform: "translateY(8%) scale(1.2)" }} aria-label="Talk to the Website Club assistant">
+        <Robot host={host as RefObject<HTMLDivElement | null>} state="idle" started dance />
+      </Link>
     </div>
   );
 }

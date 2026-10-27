@@ -12,6 +12,8 @@ interface Props {
   host: RefObject<HTMLDivElement | null>;
   state: RobotState;
   started: boolean;
+  /** dance while the host is hovered, instead of waving (homepage hero) */
+  dance?: boolean;
 }
 
 const CYAN = "#37e9ff";
@@ -29,10 +31,32 @@ function drawFace(ctx: CanvasRenderingContext2D, f: Face) {
   ctx.lineCap = "round";
 
   if (!f.started) {
-    ctx.font = "700 40px 'Space Mono', monospace";
+    const gx = f.ex * 2.5, gy = f.ey * 2.5;
+    const blinkCycle = f.t % 3.6;
+    const isBlink = blinkCycle > 3.4;
+    const ry = isBlink ? 4 : 54;
+
+    ctx.lineWidth = 17;
+    // Right eye
+    ctx.beginPath();
+    ctx.ellipse(440 + gx, 180 + gy, 40, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Left eye
+    ctx.beginPath();
+    ctx.ellipse(205 + gx, 180 + gy, 40, ry, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Subtle gentle smile
+    ctx.beginPath();
+    ctx.arc(322 + gx * 0.4, 305 + gy * 0.4, 46, Math.PI * 0.2, Math.PI * 0.8);
+    ctx.stroke();
+
+    // Pulsing "TAP TO TALK" prompt
+    ctx.font = "700 30px 'Space Mono', monospace";
     ctx.textAlign = "center";
-    ctx.globalAlpha = 0.65 + 0.35 * Math.sin(f.t * 5);
-    ctx.fillText("[CLICK] TO START", FW / 2, FH / 2 + 14);
+    ctx.globalAlpha = 0.7 + 0.3 * Math.sin(f.t * 4);
+    ctx.fillText("✦ TAP TO TALK", FW / 2, FH - 54);
     ctx.globalAlpha = 1;
     return;
   }
@@ -83,7 +107,7 @@ function drawFace(ctx: CanvasRenderingContext2D, f: Face) {
   }
 }
 
-function Bot({ host, state, started }: Props) {
+function Bot({ host, state, started, dance }: Props) {
   const root = useRef<THREE.Group>(null);
   const head = useRef<THREE.Group>(null);
   const armR = useRef<THREE.Group>(null);
@@ -143,6 +167,26 @@ function Bot({ host, state, started }: Props) {
     if (armL.current) armL.current.rotation.z = -0.22 + Math.sin(t * 1.4 + 1) * 0.03;
     if (chest.current) chest.current.emissiveIntensity = (state === "talking" ? 2.2 : 1.4) + Math.sin(t * (state === "talking" ? 10 : 2.4)) * 0.5;
     if (ears.current) ears.current.emissiveIntensity = state === "listening" ? 1.6 + Math.sin(t * 9) * 1.1 : 1.8;
+
+    const dancing = dance && hovered;
+    if (root.current) root.current.rotation.z += ((dancing ? Math.sin(t * 4.2) * 0.08 : 0) - root.current.rotation.z) * k;
+    if (dancing) {
+      // beat-driven bounce + sway layered on the cursor-follow turn, arms pump on alternate beats
+      const b = t * 4.2;
+      const s = Math.sin(b);
+      if (root.current) {
+        root.current.position.y = Math.abs(s) * 0.18 + hop;
+        root.current.rotation.y = ex * 0.02 + Math.sin(b / 2) * 0.25;
+      }
+      if (head.current) {
+        head.current.rotation.z = -s * 0.12;
+        head.current.rotation.x = ey * 0.05 + Math.abs(Math.cos(b)) * 0.08;
+      }
+      if (armL.current) armL.current.rotation.z = -0.3 - Math.max(0, s) * 1.7;
+      if (armR.current) armR.current.rotation.z = 0.3 + Math.max(0, -s) * 1.7;
+      if (antL.current) antL.current.rotation.z = 0.32 + Math.sin(b * 2) * 0.2;
+      if (antR.current) antR.current.rotation.z = -0.32 - Math.sin(b * 2 + 1) * 0.2;
+    }
   });
 
   return (

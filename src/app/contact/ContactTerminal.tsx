@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { LINES, type LineId } from "./lines";
+import { PREDEFINED_QUESTIONS, resolveWebsiteAnswer } from "@/lib/assistant-knowledge";
 import dynamic from "next/dynamic";
 import { Logo } from "@/components/ui/Logo";
 import type { RobotState } from "./Robot";
@@ -16,6 +17,7 @@ export function ContactTerminal() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [toastVisible, setToastVisible] = useState(false);
   const [choicesVisible, setChoicesVisible] = useState(false);
+  const [activePill, setActivePill] = useState<string | null>(null);
   const [subText, setSubText] = useState("");
 
   const textTargetRef = useRef<HTMLSpanElement>(null);
@@ -25,7 +27,7 @@ export function ContactTerminal() {
   const [speaking, setSpeaking] = useState(false);
   const soundEnabledRef = useRef(true);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const isTypingRef = useRef(false);
+  const isTypingStateRef = useRef(false);
   const startedRef = useRef(false);
   const currentScaleRef = useRef(1);
 
@@ -65,17 +67,22 @@ export function ContactTerminal() {
       const ctx = getAudioContext();
       if (!ctx) return;
       if (ctx.state === "suspended") ctx.resume();
-      const notes = [440, 660, 880];
+      const notes = [440, 554.37, 659.25, 880];
       notes.forEach((freq, i) => {
         setTimeout(() => {
-          playBlip(freq, "triangle", 0.1, 0.06);
-        }, i * 85);
+          playBlip(freq, "sine", 0.12, 0.06);
+        }, i * 80);
       });
     } catch {}
   };
 
   const toggleSound = () => {
-    if (soundEnabledRef.current) voiceRef.current?.pause();
+    if (soundEnabledRef.current) {
+      voiceRef.current?.pause();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
     setSoundEnabled((prev) => !prev);
   };
 
@@ -134,41 +141,49 @@ export function ContactTerminal() {
     return () => clearInterval(interval);
   }, []);
 
-  const triggerEasterEgg = () => {
-    flash("wink", 900);
-    playBlip(980, "sine", 0.15, 0.08);
-  };
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const typeMessage = (message: string, callback?: () => void) => {
-    isTypingRef.current = true;
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+      typingTimerRef.current = null;
+    }
+    isTypingStateRef.current = true;
     setTyping(true);
     setChoicesVisible(false);
-    if (textTargetRef.current) {
-      textTargetRef.current.textContent = "";
-    }
-    let index = 0;
 
+    let index = 0;
     const step = () => {
+      const el = textTargetRef.current;
+      if (!el) {
+        // If the element is still mounting, wait a frame and retry at the same index
+        typingTimerRef.current = setTimeout(step, 20);
+        return;
+      }
+
       if (index < message.length) {
-        if (textTargetRef.current) {
-          textTargetRef.current.textContent += message.charAt(index);
-        }
+        // Always set slice(0, index + 1) so no letters (like the leading 'W') are ever dropped
+        el.textContent = message.slice(0, index + 1);
+
         const charCode = message.charCodeAt(index);
         if (charCode > 32 && Math.random() > 0.35) {
           playBlip(320 + (charCode % 14) * 28, "triangle", 0.03);
         }
         index++;
-        setTimeout(step, Math.random() * 18 + 18);
+        typingTimerRef.current = setTimeout(step, Math.random() * 16 + 18);
       } else {
-        isTypingRef.current = false;
+        if (el) el.textContent = message;
+        isTypingStateRef.current = false;
         setTyping(false);
         if (callback) callback();
       }
     };
-    step();
+
+    // Small micro-delay to ensure DOM update is complete
+    typingTimerRef.current = setTimeout(step, 25);
   };
 
-  // One voice for everything: Viraj (ElevenLabs) via /api/speak. Silent if the key is missing or sound is off.
+  // Voice output: ElevenLabs via /api/speak, with graceful Web Speech Synthesis fallback
   const voiceRef = useRef<HTMLAudioElement | null>(null);
   const speak = async (text: string) => {
     voiceRef.current?.pause();
@@ -179,22 +194,42 @@ export function ContactTerminal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-      if (!res.ok) return;
-      const url = URL.createObjectURL(await res.blob());
-      const audio = new Audio(url);
-      voiceRef.current = audio;
-      audio.onplay = () => setSpeaking(true);
-      audio.onpause = () => setSpeaking(false);
-      audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(url); };
-      await audio.play();
+      if (res.ok) {
+        const url = URL.createObjectURL(await res.blob());
+        const audio = new Audio(url);
+        voiceRef.current = audio;
+        audio.onplay = () => setSpeaking(true);
+        audio.onpause = () => setSpeaking(false);
+        audio.onended = () => {
+          setSpeaking(false);
+          URL.revokeObjectURL(url);
+        };
+        await audio.play();
+        return;
+      }
     } catch {}
+
+    // Graceful client-side speech synthesis fallback
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.05;
+        utterance.onstart = () => setSpeaking(true);
+        utterance.onend = () => setSpeaking(false);
+        utterance.onerror = () => setSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+      } catch {}
+    }
   };
+
   const say = (id: LineId, done?: () => void) => {
     speak(LINES[id]);
     typeMessage(LINES[id], done);
   };
 
-  // Real conversation: the visitor's question goes to /api/chat, the answer is typed and spoken
+  // Real conversation: visitor's question answered strictly according to website data
   const historyRef = useRef<{ role: "user" | "assistant"; content: string }[]>([]);
   const [question, setQuestion] = useState("");
   const [thinking, setThinking] = useState(false);
@@ -203,8 +238,16 @@ export function ContactTerminal() {
 
   const ask = async (text: string, fallback?: LineId) => {
     const q = text.trim();
-    if (!q || isTypingRef.current || thinking) return;
+    if (!q || isTypingStateRef.current || thinking) return;
+    if (!started) {
+      setStarted(true);
+      flash("hop", 600);
+      playStartupChime();
+    }
     voiceRef.current?.pause();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     setQuestion("");
     setSubText(q);
     setChoicesVisible(false);
@@ -219,29 +262,50 @@ export function ContactTerminal() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: historyRef.current }),
       });
-      if (res.ok) reply = (await res.json()).reply ?? "";
+      if (res.ok) {
+        const data = await res.json();
+        reply = data.reply ?? "";
+      }
     } catch {}
     setThinking(false);
 
+    // If API is offline or returns empty, resolve immediately via website knowledge
     if (!reply) {
-      // no AI key or network trouble: still answer something useful
-      reply = fallback
-        ? LINES[fallback]
-        : "My brain is offline right now. Write to hello@websiteclub.com and a human will answer.";
-    } else {
-      historyRef.current.push({ role: "assistant", content: reply });
+      if (fallback && fallback in LINES) {
+        reply = LINES[fallback as LineId];
+      } else {
+        reply = resolveWebsiteAnswer(q);
+      }
     }
+    historyRef.current.push({ role: "assistant", content: reply });
     speak(reply);
     typeMessage(reply, () => setChoicesVisible(true));
   };
 
   const toggleMic = () => {
-    if (listening) { recognitionRef.current?.stop(); return; }
-    type SR = { lang: string; interimResults: boolean; onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void; onend: () => void; onerror: () => void; start: () => void; stop: () => void };
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    type SR = {
+      lang: string;
+      interimResults: boolean;
+      onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void;
+      onend: () => void;
+      onerror: () => void;
+      start: () => void;
+      stop: () => void;
+    };
     const w = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR };
     const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!Ctor) { setQuestion(""); return; }
+    if (!Ctor) {
+      setQuestion("");
+      return;
+    }
     voiceRef.current?.pause();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
     const rec = new Ctor();
     rec.lang = "en-US";
     rec.interimResults = false;
@@ -253,12 +317,15 @@ export function ContactTerminal() {
     rec.start();
   };
 
-  // Lisa's intro: greeting types out, blurs into the margin, then the real question appears with the choices
+  // Studio assistant intro: welcoming greeting, animated gestures, then follow-up with capability choices
   const playIntro = () => {
     setSubText("");
+    flash("hop", 600);
+    flash("wink", 900);
     say("greeting", () => {
       setTimeout(() => {
         setSubText(LINES.greeting);
+        flash("wink", 900);
         say("followUp", () => setChoicesVisible(true));
       }, 900);
     });
@@ -267,8 +334,11 @@ export function ContactTerminal() {
   const startOrInteract = () => {
     if (!started) {
       setStarted(true);
+      setChoicesVisible(false);
       playStartupChime();
-      playIntro();
+      setTimeout(() => {
+        playIntro();
+      }, 100);
     } else {
       flash("wink", 900);
       flash("hop", 600);
@@ -276,15 +346,13 @@ export function ContactTerminal() {
     }
   };
 
-  const PILLS: [string, string, LineId][] = [
-    ["Start a project", "I'd like to start a project. What happens next?", "project"],
-    ["Rent a 3D website", "How does renting a 3D website work, and what does it cost?", "rent"],
-    ["Transform my site", "Can you add 3D to my existing website without rebuilding it?", "transform"],
-    ["Ask a technical question", "How do you keep 3D websites fast on mobile?", "tech"],
-  ];
-
   const resetDialogue = () => {
-    if (isTypingRef.current) return;
+    if (isTypingStateRef.current) return;
+    voiceRef.current?.pause();
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+    setActivePill(null);
     setStarted(true);
     playStartupChime();
     setChoicesVisible(false);
@@ -300,14 +368,7 @@ export function ContactTerminal() {
     }, 2500);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!startedRef.current && textTargetRef.current) {
-        textTargetRef.current.textContent = "";
-      }
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
+
 
   const robotState: RobotState = listening ? "listening" : thinking ? "thinking" : speaking || typing ? "talking" : "idle";
 
@@ -316,15 +377,6 @@ export function ContactTerminal() {
       {/* Minimal Header */}
       <header className="header">
         <Logo />
-
-        {/* Minimalist Center Glyph */}
-        <div className="center-glyph" onClick={triggerEasterEgg} title="Blink">
-          <svg className="glyph-svg" viewBox="0 0 44 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 16L12 8M12 16L7 8M32 16L37 8M37 16L32 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M12 12C12 6.5 17 2 22 2C27 2 32 6.5 32 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            <path d="M5 12H39" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-        </div>
 
         <a href="mailto:hello@websiteclub.com" className="nav-contact">
           Let's talk
@@ -335,7 +387,7 @@ export function ContactTerminal() {
       <main className="lisa-stage" id="stage">
         {/* Coordinate-locked 1920x912 frame */}
         <div className="stage-frame" id="stage-frame" ref={stageFrameRef}>
-          {/* Figure is centred until the visitor starts, then slides right to make room for the dialogue */}
+          {/* Figure is centred until the visitor starts, then slides right to make room for dialogue */}
           <div className={`stage-shift ${started ? "" : "centered"}`}>
             <div className="robot-wrap">
               <div
@@ -359,26 +411,52 @@ export function ContactTerminal() {
           <p className="hud-eyebrow">
             <span className="hud-dot" />✦ WEBSITE CLUB ASSISTANT
           </p>
-          <div className={`sub-intro ${subText ? "show" : ""}`} id="sub-intro" aria-hidden="true">
-            {subText}
+
+          {!started ? (
+            <div className="intro-unstarted-wrap">
+              <h1 className="intro-unstarted-title">
+                Meet your 3D studio assistant.
+              </h1>
+              <p className="intro-unstarted-desc">
+                Tap the robot or click below to start a live audio & text conversation about our turnkey 3D rentals, custom flagships, and spatial retrofits.
+              </p>
+              <button type="button" className="btn-wake-intro" onClick={startOrInteract}>
+                <span>Wake Assistant ✦</span>
+              </button>
+            </div>
+          ) : null}
+
+          <div className="dialogue-live-area" style={{ display: started ? "block" : "none" }}>
+            <div className={`sub-intro ${subText ? "show" : ""}`} id="sub-intro" aria-hidden="true">
+              {subText}
+            </div>
+
+            <div className="main-speech">
+              <span id="typewriter-text" ref={textTargetRef}></span>
+              {thinking && <span className="thinking">thinking…</span>}
+              <span className="cursor-block" id="cursor"></span>
+            </div>
           </div>
 
-          <div className="main-speech">
-            <span id="typewriter-text" ref={textTargetRef}></span>
-            {thinking && <span className="thinking">thinking…</span>}
-            <span className="cursor-block" id="cursor"></span>
-          </div>
-
-          <div className={`choices-row ${choicesVisible ? "visible" : ""}`} id="choices-box">
-            {PILLS.map(([label, q, fb]) => (
-              <button key={label} className="pill-btn" onClick={() => ask(q, fb)}>
-                {label}
+          <div className={`choices-row ${choicesVisible || !started ? "visible" : ""}`} id="choices-box">
+            {PREDEFINED_QUESTIONS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`pill-btn ${activePill === item.id ? "active" : ""}`}
+                onClick={() => {
+                  setActivePill(item.id);
+                  ask(item.question, item.id as LineId);
+                }}
+              >
+                {item.label}
               </button>
             ))}
             <form
               className="ask-form"
               onSubmit={(e) => {
                 e.preventDefault();
+                setActivePill(null);
                 ask(question);
               }}
             >
